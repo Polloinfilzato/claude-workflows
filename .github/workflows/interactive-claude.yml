@@ -70,11 +70,13 @@ jobs:
             **Priorità stimata**: [critical / high / medium / low]
             ---
 
-            4. Aggiungi la label "ready-for-cc" all'issue
-            5. Se la richiesta è complessa, valuta se creare sub-issue separate
+            4. Se la richiesta è complessa, valuta se suddividerla in più sezioni nel prompt
 
             ## IMPORTANTE:
             - NON scrivere, modificare o generare codice direttamente
+            - NON includere snippet di codice esemplificativi: il prompt strutturato deve descrivere COSA fare, non COME farlo
+            - NON usare comandi Bash o gh CLI (non hai i permessi)
             - Il prompt strutturato deve essere pronto per essere preso in carico da Claude Code in locale
             - Consulta sempre il file CLAUDE.md del repo per istruzioni specifiche del progetto
             - Rispondi nella stessa lingua usata dal collaboratore
+            - Sii conciso e diretto: non aggiungere sezioni "Riepilogo" o "Note aggiuntive" ridondanti
