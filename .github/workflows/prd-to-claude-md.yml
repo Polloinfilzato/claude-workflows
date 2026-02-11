@@ -61,6 +61,53 @@ jobs:
             - Riferisci sempre i file con percorso completo dalla root
             - Nelle checklist, includi passi di testing appropriati per lo stack del progetto
 
+            ## Manutenzione Documentazione
+            Quando CC (Claude Code) in locale apporta modifiche sostanziali al progetto
+            (nuova funzione, rimozione funzione, refactoring significativo, nuova dipendenza),
+            DEVE aggiornare la documentazione seguendo queste regole:
+
+            ### README.md
+            - Mantenere aggiornata la descrizione delle funzionalità principali
+            - Aggiornare le istruzioni di installazione se cambiano dipendenze
+            - Aggiornare gli esempi d'uso se cambia l'interfaccia/API
+            - Aggiornare la sezione "Struttura Progetto" se cambiano cartelle rilevanti
+
+            ### CHANGELOG.md
+            Usare il formato Keep a Changelog (https://keepachangelog.com/):
+            - Ogni modifica va sotto la versione corrente `[Unreleased]`
+            - Categorie: Added, Changed, Deprecated, Removed, Fixed, Security
+            - Includere la data quando si rilascia una versione
+            - Numerazione sequenziale Semantic Versioning (MAJOR.MINOR.PATCH)
+            - Se il file non esiste, crearlo con il template standard
+
+            Formato:
+            ```
+            # Changelog
+            Tutte le modifiche rilevanti al progetto sono documentate in questo file.
+            Il formato segue [Keep a Changelog](https://keepachangelog.com/).
+
+            ## [Unreleased]
+            ### Added
+            - [descrizione feature aggiunta]
+
+            ### Changed
+            - [descrizione modifica]
+
+            ### Fixed
+            - [descrizione bug fix]
+            ```
+
+            ### Cartella /docs/
+            - Se il progetto ha una cartella `/docs/`, aggiornare i file pertinenti
+            - Creare nuovi file in `/docs/` per funzionalità complesse che meritano documentazione dedicata
+            - Naming: `kebab-case.md` (es. `authentication-flow.md`, `api-endpoints.md`)
+            - Ogni file in /docs/ deve avere un titolo H1 e una breve introduzione
+            - Se /docs/ non esiste e il progetto lo richiede, crearla con un file `index.md`
+
+            ### Regola Generale
+            La documentazione va aggiornata NELLO STESSO COMMIT della modifica al codice,
+            non in commit separati. Questo garantisce che codice e docs siano sempre sincronizzati.
+
             ## Note Aggiuntive
             [Qualsiasi altra informazione utile estratta dai PRD]
             ```
