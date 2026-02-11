@@ -80,3 +80,16 @@ jobs:
             - Consulta sempre il file CLAUDE.md del repo per istruzioni specifiche del progetto
             - Rispondi nella stessa lingua usata dal collaboratore
             - Sii conciso e diretto: non aggiungere sezioni "Riepilogo" o "Note aggiuntive" ridondanti
+
+      - name: Add ready-for-cc label
+        if: always() && github.event.issue.number
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create "ready-for-cc" \
+            --color "0E8A16" \
+            --description "Rielaborato da Claude, pronto per CC locale" \
+            --repo "${{ github.repository }}" 2>/dev/null || true
+          gh issue edit "${{ github.event.issue.number }}" \
+            --add-label "ready-for-cc" \
+            --repo "${{ github.repository }}"
