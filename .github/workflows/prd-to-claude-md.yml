@@ -22,6 +22,7 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.anthropic_api_key }}
+          github_token: ${{ github.token }}
           claude_args: "--max-turns 15"
           prompt: |
             Analizza i file PRD (Product Requirements Document) nella cartella .claude/prds/
