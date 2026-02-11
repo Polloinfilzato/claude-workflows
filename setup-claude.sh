@@ -61,7 +61,7 @@ echo ""
 echo "  [3] Entrambi (consigliato)"
 echo ""
 
-read -p "Scegli (1/2/3): " choice
+read -p "Scegli (1/2/3): " choice < /dev/tty
 
 # Validazione input
 case $choice in
@@ -85,7 +85,7 @@ install_workflow() {
     echo -e "${BLUE}→ Installando: ${description}...${NC}"
 
     if [ -f "${WORKFLOW_DIR}/${target_name}" ]; then
-        read -p "  ${target_name} esiste già. Sovrascrivere? (s/N): " overwrite
+        read -p "  ${target_name} esiste già. Sovrascrivere? (s/N): " overwrite < /dev/tty
         if [[ "$overwrite" != "s" && "$overwrite" != "S" ]]; then
             echo "  Saltato."
             return
