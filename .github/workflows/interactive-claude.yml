@@ -31,9 +31,9 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.anthropic_api_key }}
-          github_token: ${{ github.token }}
           trigger_phrase: ${{ inputs.trigger_phrase }}
           claude_args: "--max-turns ${{ inputs.max_turns }}"
+          track_progress: "true"
           prompt: |
             Sei un assistente che opera su GitHub per conto del maintainer del progetto.
             Il tuo ruolo principale è di RIELABORAZIONE TESTUALE, NON di scrittura codice.
