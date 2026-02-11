@@ -1,0 +1,73 @@
+name: PRD to CLAUDE.md (Reusable)
+
+on:
+  workflow_call:
+    secrets:
+      anthropic_api_key:
+        required: true
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.anthropic_api_key }}
+          claude_args: "--max-turns 15"
+          prompt: |
+            Analizza i file PRD (Product Requirements Document) nella cartella .claude/prds/
+            e il codebase esistente del repository.
+
+            Il tuo compito è generare o aggiornare il file CLAUDE.md nella root del repository
+            con le istruzioni specifiche del progetto.
+
+            ## ANALISI DA EFFETTUARE:
+            1. Leggi TUTTI i file .md in .claude/prds/
+            2. Analizza il codebase: struttura cartelle, tecnologie, pattern usati
+            3. Identifica lo stack tecnologico dai file di configurazione (package.json, requirements.txt, Cargo.toml, ecc.)
+            4. Rileva convenzioni di naming e struttura già presenti nel codice
+
+            ## STRUTTURA DEL CLAUDE.md DA GENERARE:
+
+            ```markdown
+            # Istruzioni Specifiche Progetto
+
+            ## Panoramica
+            [Breve descrizione del progetto basata sui PRD]
+
+            ## Stack Tecnologico
+            [Lista tecnologie rilevate dal codebase e dai PRD]
+
+            ## Struttura Progetto
+            [Mappa delle cartelle principali con descrizione]
+
+            ## Convenzioni
+            [Naming, stile, pattern rilevati o specificati nei PRD]
+
+            ## Dipendenze Chiave
+            [Librerie e framework principali con versione]
+
+            ## Istruzioni per @claude su GitHub
+            (Queste integrano le regole globali dell'utente)
+            - Quando rielabori prompt, considera lo stack e la struttura sopra indicati
+            - Riferisci sempre i file con percorso completo dalla root
+            - Nelle checklist, includi passi di testing appropriati per lo stack del progetto
+
+            ## Note Aggiuntive
+            [Qualsiasi altra informazione utile estratta dai PRD]
+            ```
+
+            ## REGOLE IMPORTANTI:
+            - Se CLAUDE.md esiste già, PRESERVA qualsiasi contenuto aggiunto manualmente dall'utente
+            - Aggiungi un commento <!-- Generato automaticamente da PRD - Ultimo aggiornamento: [data] -->
+            - Se non riesci a determinare qualcosa con certezza, omettilo piuttosto che inventare
+            - Basa le informazioni SOLO su quello che trovi nei PRD e nel codebase reale
+            - Fai commit delle modifiche con messaggio: "chore: aggiorna CLAUDE.md da PRD"
