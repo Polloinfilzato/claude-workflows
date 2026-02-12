@@ -11,112 +11,105 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
-      issues: write
-      id-token: write
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.anthropic_api_key }}
-          github_token: ${{ github.token }}
-          claude_args: "--max-turns 15"
-          prompt: |
-            Analizza i file PRD (Product Requirements Document) nella cartella .claude/prds/
-            e il codebase esistente del repository.
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-            Il tuo compito è generare o aggiornare il file CLAUDE.md nella root del repository
-            con le istruzioni specifiche del progetto.
+      - name: Generate CLAUDE.md from PRDs
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.anthropic_api_key }}
+        run: |
+          PROMPT=$(cat <<'ENDPROMPT'
+          Analizza i file PRD (Product Requirements Document) nella cartella .claude/prds/
+          e il codebase esistente del repository.
 
-            ## ANALISI DA EFFETTUARE:
-            1. Leggi TUTTI i file .md in .claude/prds/
-            2. Analizza il codebase: struttura cartelle, tecnologie, pattern usati
-            3. Identifica lo stack tecnologico dai file di configurazione (package.json, requirements.txt, Cargo.toml, ecc.)
-            4. Rileva convenzioni di naming e struttura già presenti nel codice
+          Il tuo compito è generare o aggiornare il file CLAUDE.md nella root del repository
+          con le istruzioni specifiche del progetto.
 
-            ## STRUTTURA DEL CLAUDE.md DA GENERARE:
+          ## ANALISI DA EFFETTUARE:
+          1. Leggi TUTTI i file .md in .claude/prds/
+          2. Analizza il codebase: struttura cartelle, tecnologie, pattern usati
+          3. Identifica lo stack tecnologico dai file di configurazione (package.json, requirements.txt, Cargo.toml, ecc.)
+          4. Rileva convenzioni di naming e struttura già presenti nel codice
 
-            ```markdown
-            # Istruzioni Specifiche Progetto
+          ## STRUTTURA DEL CLAUDE.md DA GENERARE:
 
-            ## Panoramica
-            [Breve descrizione del progetto basata sui PRD]
+          # Istruzioni Specifiche Progetto
 
-            ## Stack Tecnologico
-            [Lista tecnologie rilevate dal codebase e dai PRD]
+          ## Panoramica
+          [Breve descrizione del progetto basata sui PRD]
 
-            ## Struttura Progetto
-            [Mappa delle cartelle principali con descrizione]
+          ## Stack Tecnologico
+          [Lista tecnologie rilevate dal codebase e dai PRD]
 
-            ## Convenzioni
-            [Naming, stile, pattern rilevati o specificati nei PRD]
+          ## Struttura Progetto
+          [Mappa delle cartelle principali con descrizione]
 
-            ## Dipendenze Chiave
-            [Librerie e framework principali con versione]
+          ## Convenzioni
+          [Naming, stile, pattern rilevati o specificati nei PRD]
 
-            ## Istruzioni per @claude su GitHub
-            (Queste integrano le regole globali dell'utente)
-            - Quando rielabori prompt, considera lo stack e la struttura sopra indicati
-            - Riferisci sempre i file con percorso completo dalla root
-            - Nelle checklist, includi passi di testing appropriati per lo stack del progetto
+          ## Dipendenze Chiave
+          [Librerie e framework principali con versione]
 
-            ## Manutenzione Documentazione
-            Quando CC (Claude Code) in locale apporta modifiche sostanziali al progetto
-            (nuova funzione, rimozione funzione, refactoring significativo, nuova dipendenza),
-            DEVE aggiornare la documentazione seguendo queste regole:
+          ## Istruzioni per @claude su GitHub
+          (Queste integrano le regole globali dell utente)
+          - Quando rielabori prompt, considera lo stack e la struttura sopra indicati
+          - Riferisci sempre i file con percorso completo dalla root
+          - Nelle checklist, includi passi di testing appropriati per lo stack del progetto
 
-            ### README.md
-            - Mantenere aggiornata la descrizione delle funzionalità principali
-            - Aggiornare le istruzioni di installazione se cambiano dipendenze
-            - Aggiornare gli esempi d'uso se cambia l'interfaccia/API
-            - Aggiornare la sezione "Struttura Progetto" se cambiano cartelle rilevanti
+          ## Manutenzione Documentazione
+          Quando CC (Claude Code) in locale apporta modifiche sostanziali al progetto
+          (nuova funzione, rimozione funzione, refactoring significativo, nuova dipendenza),
+          DEVE aggiornare la documentazione seguendo queste regole:
 
-            ### CHANGELOG.md
-            Usare il formato Keep a Changelog (https://keepachangelog.com/):
-            - Ogni modifica va sotto la versione corrente `[Unreleased]`
-            - Categorie: Added, Changed, Deprecated, Removed, Fixed, Security
-            - Includere la data quando si rilascia una versione
-            - Numerazione sequenziale Semantic Versioning (MAJOR.MINOR.PATCH)
-            - Se il file non esiste, crearlo con il template standard
+          ### README.md
+          - Mantenere aggiornata la descrizione delle funzionalita principali
+          - Aggiornare le istruzioni di installazione se cambiano dipendenze
+          - Aggiornare gli esempi d uso se cambia l interfaccia/API
+          - Aggiornare la sezione Struttura Progetto se cambiano cartelle rilevanti
 
-            Formato:
-            ```
-            # Changelog
-            Tutte le modifiche rilevanti al progetto sono documentate in questo file.
-            Il formato segue [Keep a Changelog](https://keepachangelog.com/).
+          ### CHANGELOG.md
+          Usare il formato Keep a Changelog (https://keepachangelog.com/):
+          - Ogni modifica va sotto la versione corrente [Unreleased]
+          - Categorie: Added, Changed, Deprecated, Removed, Fixed, Security
+          - Includere la data quando si rilascia una versione
+          - Numerazione sequenziale Semantic Versioning (MAJOR.MINOR.PATCH)
+          - Se il file non esiste, crearlo con il template standard
 
-            ## [Unreleased]
-            ### Added
-            - [descrizione feature aggiunta]
+          ### Cartella /docs/
+          - Se il progetto ha una cartella /docs/, aggiornare i file pertinenti
+          - Creare nuovi file in /docs/ per funzionalita complesse che meritano documentazione dedicata
+          - Naming: kebab-case.md (es. authentication-flow.md, api-endpoints.md)
+          - Ogni file in /docs/ deve avere un titolo H1 e una breve introduzione
+          - Se /docs/ non esiste e il progetto lo richiede, crearla con un file index.md
 
-            ### Changed
-            - [descrizione modifica]
+          ### Regola Generale
+          La documentazione va aggiornata NELLO STESSO COMMIT della modifica al codice,
+          non in commit separati. Questo garantisce che codice e docs siano sempre sincronizzati.
 
-            ### Fixed
-            - [descrizione bug fix]
-            ```
+          ## Note Aggiuntive
+          [Qualsiasi altra informazione utile estratta dai PRD]
 
-            ### Cartella /docs/
-            - Se il progetto ha una cartella `/docs/`, aggiornare i file pertinenti
-            - Creare nuovi file in `/docs/` per funzionalità complesse che meritano documentazione dedicata
-            - Naming: `kebab-case.md` (es. `authentication-flow.md`, `api-endpoints.md`)
-            - Ogni file in /docs/ deve avere un titolo H1 e una breve introduzione
-            - Se /docs/ non esiste e il progetto lo richiede, crearla con un file `index.md`
+          ## REGOLE IMPORTANTI:
+          - Se CLAUDE.md esiste gia, PRESERVA qualsiasi contenuto aggiunto manualmente dall utente
+          - Aggiungi un commento HTML in cima: Generato automaticamente da PRD con la data
+          - Se non riesci a determinare qualcosa con certezza, omettilo piuttosto che inventare
+          - Basa le informazioni SOLO su quello che trovi nei PRD e nel codebase reale
+          - Fai commit delle modifiche con messaggio: "chore: aggiorna CLAUDE.md da PRD"
+          ENDPROMPT
+          )
 
-            ### Regola Generale
-            La documentazione va aggiornata NELLO STESSO COMMIT della modifica al codice,
-            non in commit separati. Questo garantisce che codice e docs siano sempre sincronizzati.
+          npx -y @anthropic-ai/claude-code@latest -p \
+            --max-turns 15 \
+            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(git add *),Bash(git commit *),Bash(git status *),Bash(git diff *)" \
+            "$PROMPT"
 
-            ## Note Aggiuntive
-            [Qualsiasi altra informazione utile estratta dai PRD]
-            ```
-
-            ## REGOLE IMPORTANTI:
-            - Se CLAUDE.md esiste già, PRESERVA qualsiasi contenuto aggiunto manualmente dall'utente
-            - Aggiungi un commento <!-- Generato automaticamente da PRD - Ultimo aggiornamento: [data] -->
-            - Se non riesci a determinare qualcosa con certezza, omettilo piuttosto che inventare
-            - Basa le informazioni SOLO su quello che trovi nei PRD e nel codebase reale
-            - Fai commit delle modifiche con messaggio: "chore: aggiorna CLAUDE.md da PRD"
+      - name: Push changes
+        run: |
+          git diff --quiet HEAD origin/$(git branch --show-current) 2>/dev/null || git push
