@@ -5,8 +5,9 @@
 # - Secret ANTHROPIC_API_KEY configurato nel repo (Settings > Secrets > Actions)
 # - Cartella .claude/prds/ con almeno un file .md
 #
-# Questo workflow si attiva automaticamente quando vengono pushati
-# file nella cartella .claude/prds/ e genera/aggiorna il CLAUDE.md di progetto.
+# Trigger:
+# - Automatico: quando vengono pushati file in .claude/prds/
+# - Manuale: dalla tab Actions > Claude PRD Analysis > Run workflow
 
 name: Claude PRD Analysis
 
@@ -14,12 +15,10 @@ on:
   push:
     paths:
       - '.claude/prds/**'
+  workflow_dispatch:
 
 permissions:
   contents: write
-  pull-requests: write
-  issues: write
-  id-token: write
 
 jobs:
   generate-claude-md:
