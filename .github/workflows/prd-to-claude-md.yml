@@ -105,10 +105,9 @@ jobs:
           ENDPROMPT
           )
 
-          npx -y @anthropic-ai/claude-code@latest -p \
+          echo "$PROMPT" | npx -y @anthropic-ai/claude-code@latest -p \
             --max-turns 15 \
-            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(git add *),Bash(git commit *),Bash(git status *),Bash(git diff *)" \
-            "$PROMPT"
+            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(git add *),Bash(git commit *),Bash(git status *),Bash(git diff *)"
 
       - name: Push changes
         run: |
